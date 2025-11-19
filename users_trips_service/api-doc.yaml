@@ -62,6 +62,134 @@ paths:
         '400':
           description: Invalid credentials
 
+  /api/trips:
+    get:
+      summary: Get all trips of authenticated user
+      tags:
+        - Trips
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of trips
+        '401':
+          description: Unauthorized
+
+    post:
+      summary: Create a new trip
+      tags:
+        - Trips
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - startDate
+                - endDate
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                startDate:
+                  type: string
+                  format: date
+                endDate:
+                  type: string
+                  format: date
+                imageUrl:
+                  type: string
+      responses:
+        '201':
+          description: Trip created
+        '401':
+          description: Unauthorized
+
+  /api/trips/{id}:
+    get:
+      summary: Get a trip by ID
+      tags:
+        - Trips
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Trip details
+        '401':
+          description: Unauthorized
+        '404':
+          description: Trip not found
+
+    put:
+      summary: Update a trip by ID
+      tags:
+        - Trips
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                startDate:
+                  type: string
+                  format: date
+                endDate:
+                  type: string
+                  format: date
+                imageUrl:
+                  type: string
+      responses:
+        '200':
+          description: Trip updated
+        '401':
+          description: Unauthorized
+        '404':
+          description: Trip not found
+
+    delete:
+      summary: Delete a trip by ID
+      tags:
+        - Trips
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Trip deleted
+        '401':
+          description: Unauthorized
+        '404':
+          description: Trip not found
+
 components:
   securitySchemes:
     bearerAuth:

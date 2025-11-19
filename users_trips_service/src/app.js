@@ -3,13 +3,16 @@ const express = require("express");
 const cors = require("cors");
 const { sequelize } = require("./models");
 const userRoutes = require("./routes/userRoutes");
+const tripRoutes = require("./routes/tripRoutes");
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
 app.use("/api/users", userRoutes);
+app.use("/api/trips", tripRoutes);
 
+//SWAGGER
 const swaggerUi = require('swagger-ui-express');
 const YAML = require('yamljs');
 const swaggerDocument = YAML.load('./api-doc.yaml');
