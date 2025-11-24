@@ -7,7 +7,7 @@ const Trip = sequelize.define("Trip", {
     description: { type: DataTypes.TEXT },
     startDate: { type: DataTypes.DATE },
     endDate: { type: DataTypes.DATE },
-    imageUrl: { type: DataTypes.STRING },
+    imageUrl: { type: DataTypes.STRING }
 }, {
   tableName: "trips",
   timestamps: true

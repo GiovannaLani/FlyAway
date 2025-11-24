@@ -12,7 +12,6 @@ app.use(express.json());
 app.use("/api/users", userRoutes);
 app.use("/api/trips", tripRoutes);
 
-//SWAGGER
 const swaggerUi = require('swagger-ui-express');
 const YAML = require('yamljs');
 const swaggerDocument = YAML.load('./api-doc.yaml');

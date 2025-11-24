@@ -3,7 +3,7 @@ info:
   title: FlyAway - Users & Trips Service
   version: 1.0.0
   description: API para autenticación de usuarios y gestión de viajes.
-
+  
 servers:
   - url: http://localhost:3001
 
@@ -104,6 +104,11 @@ paths:
                   format: date
                 imageUrl:
                   type: string
+                participants:
+                  type: array
+                  items:
+                    type: string
+                  description: Emails of participants to add initially (optional)
       responses:
         '201':
           description: Trip created
@@ -189,6 +194,128 @@ paths:
           description: Unauthorized
         '404':
           description: Trip not found
+
+  /api/trips/{id}/participants:
+    post:
+      summary: Add a participant to a trip
+      tags:
+        - Participants
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+              properties:
+                email:
+                  type: string
+      responses:
+        '200':
+          description: Participant added
+        '401':
+          description: Unauthorized
+        '403':
+          description: Only admins can add participants
+        '404':
+          description: User not found
+
+    get:
+      summary: Get all participants of a trip
+      tags:
+        - Participants
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: List of participants
+        '401':
+          description: Unauthorized
+        '403':
+          description: Only participants can view the list
+
+  /api/trips/{id}/participants/{userId}:
+    delete:
+      summary: Remove a participant from a trip
+      tags:
+        - Participants
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Participant removed
+        '401':
+          description: Unauthorized
+        '403':
+          description: Only admins can remove participants
+        '404':
+          description: Participant not found
+  
+  /api/trips/{id}/participants/{userId}/role:
+    patch:
+      summary: Change role of a participant (admin/member)
+      tags:
+        - Participants
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - role
+              properties:
+                role:
+                  type: string
+                  enum: [admin, member]
+      responses:
+        '200':
+          description: Role updated
+        '401':
+          description: Unauthorized
+        '403':
+          description: Only admins can change roles
+        '404':
+          description: Participant not found
 
 components:
   securitySchemes:
