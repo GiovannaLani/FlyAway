@@ -18,7 +18,7 @@ export default function TripsPage() {
       setLoading(true);
       try {
         const res = await client.get("/trips");
-        setTrips(res.data.trips ?? []);
+        setTrips(Array.isArray(res.data) ? res.data : []);
       } catch (err: any) {
         alert(err.response?.data?.message || err.message);
       } finally {
