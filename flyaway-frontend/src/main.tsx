@@ -5,6 +5,7 @@ import './index.css'
 import './App.css'
 import App from './App.tsx'
 import { AuthProvider } from './auth/AuthProvider.tsx'
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

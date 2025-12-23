@@ -22,12 +22,12 @@ export class CreateTripDto {
     endDate?: string;
 
     @IsOptional()
-    @IsString()
-    @ApiProperty({ example: 'http://example.com/image.jpg', required: false })
-    imageUrl?: string;
-
-    @IsOptional()
     @IsArray()
     @ApiProperty({ example: ['participant1@example.com', 'participant2@example.com'], required: false })
     participants?: string[];
+
+    @IsOptional()
+    @IsString()
+    @ApiProperty({ example: '/uploads/summer-vacation.jpg', required: false })
+    imageUrl?: string;
 }

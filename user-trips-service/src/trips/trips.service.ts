@@ -5,6 +5,8 @@ import { User } from 'src/users/user.model';
 import { UserTrip } from 'src/user-trips/user-trip.model';
 import { CreateTripDto } from './dto/create-trip.dto';
 import { UpdateTripDto } from './dto/update-trip.dto';
+import path from 'path';
+import * as fs from 'fs';
 
 @Injectable()
 export class TripsService {
@@ -14,38 +16,51 @@ export class TripsService {
         @InjectModel(User) private userModel: typeof User
     ) {}
 
-    async createTrip(userId: number, dto: CreateTripDto) {
-        const { name , description, startDate, endDate, imageUrl } = dto;
+    async createTrip(userId: number, dto: CreateTripDto, file?: Express.Multer.File) {
+        let imageUrl: string | undefined;
+
+        if (file) {
+            const uploadDir = path.join(__dirname, '../../uploads');
+
+            if (!fs.existsSync(uploadDir)) {
+            fs.mkdirSync(uploadDir);
+            }
+
+            const filename = `${Date.now()}-${file.originalname}`;
+            const filePath = path.join(uploadDir, filename);
+
+            fs.writeFileSync(filePath, file.buffer);
+
+            imageUrl = `/uploads/${filename}`;
+        }
+
         const trip = await this.tripModel.create({
-            name,
-            description,
-            startDate,
-            endDate,
-            imageUrl
+            ...dto,
+            imageUrl,
         });
 
         await this.userTripModel.create({
             userId,
             tripId: trip.id,
-            role: 'admin'
+            role: 'admin',
         });
 
         if (dto.participants?.length) {
-        for (const email of dto.participants) {
-            const user = await this.userModel.findOne({ where: { email } });
-            if (!user) continue;
+            for (const email of dto.participants) {
+                const user = await this.userModel.findOne({ where: { email } });
+                if (!user) continue;
 
-            const exists = await this.userTripModel.findOne({
-            where: { userId: user.id, tripId: trip.id }
-            });
-            if (exists) continue;
+                const exists = await this.userTripModel.findOne({
+                where: { userId: user.id, tripId: trip.id }
+                });
+                if (exists) continue;
 
-            await this.userTripModel.create({
-            userId: user.id,
-            tripId: trip.id,
-            role: 'member'
-            });
-        }
+                await this.userTripModel.create({
+                userId: user.id,
+                tripId: trip.id,
+                role: 'member'
+                });
+            }
         }
 
         return trip;

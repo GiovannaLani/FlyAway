@@ -8,6 +8,7 @@ import HomePage from "./pages/HomePage";
 import TripsPage from "./pages/TripsPage";
 import { useAuth } from "./auth/AuthProvider";
 import Header from "./components/Header";
+import CreateTripPage from './pages/CreateTripPage';
 
 function PrivateRoute({ children }: { children: JSX.Element }) {
   const { token } = useAuth();
@@ -38,6 +39,15 @@ function App() {
           element={
             <PrivateRoute>
               <TripsPage />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/trips/new"
+          element={
+            <PrivateRoute>
+              <CreateTripPage />
             </PrivateRoute>
           }
         />

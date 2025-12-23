@@ -1,10 +1,11 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { TripsService } from './trips.service';
 import { CreateTripDto } from './dto/create-trip.dto';
 import { UpdateTripDto } from './dto/update-trip.dto';
 import { AddParticipantDto } from './dto/add-participant.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { ApiBearerAuth, ApiTags, ApiProperty, ApiOperation, ApiBody } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags, ApiOperation, ApiBody, ApiConsumes } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('Trips')
 @ApiBearerAuth()
@@ -14,10 +15,40 @@ export class TripsController {
     constructor(private readonly tripsService: TripsService) {}
 
     @Post()
-    @ApiOperation({ summary: 'Create a new trip' })
-    @ApiBody({ type: CreateTripDto })
-    create(@Req() req, @Body() dto: CreateTripDto) {
-        return this.tripsService.createTrip(req.user.id, dto);
+    @UseInterceptors(FileInterceptor('image'))
+    @ApiConsumes('multipart/form-data')
+    @ApiBody({
+        schema: {
+        type: 'object',
+        properties: {
+            image: {
+            type: 'string',
+            format: 'binary',
+            },
+            name: { type: 'string' },
+            description: { type: 'string' },
+            startDate: { type: 'string', format: 'date' },
+            endDate: { type: 'string', format: 'date' },
+            participants: {
+            type: 'array',
+            items: { type: 'string' },
+            },
+        },
+        required: ['name'],
+        },
+    })
+    create(@Req() req, @Body() body: any, @UploadedFile() file?: Express.Multer.File) {
+        const dto: CreateTripDto = {
+            name: body.name,
+            description: body.description,
+            startDate: body.startDate,
+            endDate: body.endDate,
+            imageUrl: file ? `/uploads/${Date.now()}-${file.originalname}` : undefined,
+            participants: body.participants ? JSON.parse(body.participants) : [],
+        };
+        console.log('participants:', dto.participants);
+
+        return this.tripsService.createTrip(req.user.id, dto, file);
     }
 
     @Get()

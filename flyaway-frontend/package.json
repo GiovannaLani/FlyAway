@@ -15,6 +15,7 @@
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-router-dom": "^7.9.6",
+    "reactstrap": "^9.2.3",
     "sass-embedded": "^1.93.3"
   },
   "devDependencies": {
