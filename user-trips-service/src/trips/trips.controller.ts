@@ -29,6 +29,7 @@ export class TripsController {
             description: { type: 'string' },
             startDate: { type: 'string', format: 'date' },
             endDate: { type: 'string', format: 'date' },
+            isPublic: { type: 'boolean' },
             participants: {
             type: 'array',
             items: { type: 'string' },
@@ -43,6 +44,7 @@ export class TripsController {
             description: body.description,
             startDate: body.startDate,
             endDate: body.endDate,
+            isPublic: body.isPublic === 'true',
             imageUrl: file ? `/uploads/${Date.now()}-${file.originalname}` : undefined,
             participants: body.participants ? JSON.parse(body.participants) : [],
         };
@@ -114,8 +116,29 @@ export class TripsController {
     }
 
     @Get(':id/participants')
-        @ApiOperation({ summary: 'Get all participants of a trip' })
+    @ApiOperation({ summary: 'Get all participants of a trip' })
     getParticipants(@Req() req, @Param('id') id: number) {
         return this.tripsService.getParticipants(req.user.id, id);
     }
+    @Patch(':id/start-date')
+    updateStartDate(
+        @Req() req,
+        @Param('id') tripId: number,
+        @Body('startDate') startDate: string,
+    ) {
+        return this.tripsService.updateStartDate(req.user.id,tripId,startDate);
+    }
+
+    @Post(':id/image')
+    @UseInterceptors(FileInterceptor('image'))
+    @ApiConsumes('multipart/form-data')
+    @ApiOperation({ summary: 'Update trip image' })
+    async updateImage(
+        @Req() req,
+        @Param('id') id: number,
+        @UploadedFile() file: Express.Multer.File,
+    ) {
+        return this.tripsService.updateTripImage(req.user.id, id, file);
+    }
+
 }

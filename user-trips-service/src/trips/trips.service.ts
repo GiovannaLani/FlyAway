@@ -5,15 +5,22 @@ import { User } from 'src/users/user.model';
 import { UserTrip } from 'src/user-trips/user-trip.model';
 import { CreateTripDto } from './dto/create-trip.dto';
 import { UpdateTripDto } from './dto/update-trip.dto';
-import path from 'path';
+import path, { join } from 'path';
 import * as fs from 'fs';
+import { TripDay } from 'src/itinerary/trip-day.model';
+import { Sequelize } from 'sequelize-typescript/dist/sequelize/sequelize/sequelize';
+import { Activity } from 'src/itinerary/activity.model';
+
 
 @Injectable()
 export class TripsService {
     constructor(
         @InjectModel(Trip) private tripModel: typeof Trip,
         @InjectModel(UserTrip) private userTripModel: typeof UserTrip,
-        @InjectModel(User) private userModel: typeof User
+        @InjectModel(User) private userModel: typeof User,
+        @InjectModel(TripDay) private dayModel: typeof TripDay,
+        @InjectModel(Activity) private activityModel: typeof Activity,
+        private readonly sequelize: Sequelize
     ) {}
 
     async createTrip(userId: number, dto: CreateTripDto, file?: Express.Multer.File) {
@@ -63,6 +70,15 @@ export class TripsService {
             }
         }
 
+        const dates = this.generateDates(dto.startDate!, dto.endDate);
+
+        for (const date of dates) {
+            await this.dayModel.create({
+            tripId: trip.id,
+            date,
+            });
+        }
+
         return trip;
     }
 
@@ -76,15 +92,25 @@ export class TripsService {
     }
 
     async getTripById(userId: number, tripId: number) {
-        const relation = await this.userTripModel.findOne({
+        const userTrip = await this.userTripModel.findOne({
             where: { userId, tripId },
             include: [{ model: Trip }],
         });
 
-        if (!relation)
+        if (!userTrip)
         throw new NotFoundException('Trip not found or not allowed');
 
-        return relation.trip;
+        const trip = userTrip.trip;
+
+        return {
+            id: trip.id,
+            name: trip.name,
+            description: trip.description,
+            imageUrl: trip.imageUrl,
+            isPublic: trip.isPublic,
+            startDate: trip.startDate,
+            role: userTrip.role
+        };
     }
 
     async updateTrip(
@@ -106,16 +132,54 @@ export class TripsService {
     }
 
     async deleteTrip(userId: number, tripId: number) {
-        const relation = await this.userTripModel.findOne({
-            where: { userId, tripId, role: 'admin' }
+        return this.sequelize.transaction(async (t) => {
+
+            const rel = await this.userTripModel.findOne({
+            where: { userId, tripId },
+            include: [{ model: Trip }],
+            transaction: t,
+            });
+
+            if (!rel || rel.role !== 'admin') {
+            throw new ForbiddenException();
+            }
+
+            if (rel.trip.imageUrl) {
+            const path = join(__dirname, '../../', rel.trip.imageUrl);
+            if (fs.existsSync(path)) fs.unlinkSync(path);
+            }
+
+            const days = await this.dayModel.findAll({
+            where: { tripId },
+            transaction: t,
+            });
+
+            const dayIds = days.map(d => d.id);
+
+            if (dayIds.length > 0) {
+            await this.activityModel.destroy({
+                where: { tripDayId: dayIds },
+                transaction: t,
+            });
+            }
+
+            await this.dayModel.destroy({
+            where: { tripId },
+            transaction: t,
+            });
+
+            await this.userTripModel.destroy({
+            where: { tripId },
+            transaction: t,
+            });
+
+            await this.tripModel.destroy({
+            where: { id: tripId },
+            transaction: t,
+            });
+
+            return { success: true };
         });
-
-        if (!relation)
-        throw new ForbiddenException('Only admins can delete the trip');
-
-        await this.tripModel.destroy({ where: { id: tripId } });
-
-        return { message: 'Trip deleted' };
     }
 
     async addParticipant(
@@ -227,4 +291,75 @@ export class TripsService {
             role: p.role
         }));
     }
+
+    generateDates(start: string, end?: string): string[] {
+        const dates: string[] = [];
+
+        const current = new Date(start);
+        const last = end ? new Date(end) : new Date(start);
+
+        while (current <= last) {
+            dates.push(current.toISOString().split('T')[0]);
+            current.setDate(current.getDate() + 1);
+        }
+
+        return dates;
+    }
+
+    async updateStartDate(userId: number, tripId: number, newStartDate: string,) {
+
+        const days = await this.dayModel.findAll({ where: { tripId }, order: [['date', 'ASC']],});
+
+        if (!days.length) return;
+
+        const oldStart = new Date(days[0].date);
+        const newStart = new Date(newStartDate);
+
+        const diffDays = Math.round((newStart.getTime() - oldStart.getTime()) / (1000 * 60 * 60 * 24),);
+
+        for (let i = 0; i < days.length; i++) {
+            const date = new Date(days[i].date);
+            date.setDate(date.getDate() + diffDays);
+
+            await days[i].update({date: date.toISOString().split('T')[0],});
+        }
+
+        await this.tripModel.update({ startDate: newStartDate }, { where: { id: tripId } },);
+    }
+
+    async updateTripImage( userId: number, tripId: number, file: Express.Multer.File ) {
+        const rel = await this.userTripModel.findOne({where: { userId, tripId },});
+
+        if (!rel || rel.role !== 'admin') {
+            throw new ForbiddenException('No tienes permisos');
+        }
+
+        const trip = await this.tripModel.findByPk(tripId);
+        if (!trip) throw new NotFoundException('Trip not found');
+
+        const uploadDir = path.join(__dirname, '../../uploads');
+        if (!fs.existsSync(uploadDir)) {
+            fs.mkdirSync(uploadDir, { recursive: true });
+        }
+
+        if (trip.imageUrl) {
+            const oldPath = path.join(__dirname,'../../',trip.imageUrl.replace(/^\//, ''),);
+
+            if (fs.existsSync(oldPath)) {
+                fs.unlinkSync(oldPath);
+            }
+        }
+
+        const filename = `${Date.now()}-${file.originalname}`;
+        const filepath = path.join(uploadDir, filename);
+
+        fs.writeFileSync(filepath, file.buffer);
+
+        const imageUrl = `/uploads/${filename}`;
+
+        await trip.update({ imageUrl });
+
+        return { imageUrl };
+    }
+
 }

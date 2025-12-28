@@ -9,6 +9,7 @@ import TripsPage from "./pages/TripsPage";
 import { useAuth } from "./auth/AuthProvider";
 import Header from "./components/Header";
 import CreateTripPage from './pages/CreateTripPage';
+import TripDetailPage from './pages/TripDetailPage';
 
 function PrivateRoute({ children }: { children: JSX.Element }) {
   const { token } = useAuth();
@@ -48,6 +49,15 @@ function App() {
           element={
             <PrivateRoute>
               <CreateTripPage />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/trips/:tripId"
+          element={
+            <PrivateRoute>
+              <TripDetailPage />
             </PrivateRoute>
           }
         />

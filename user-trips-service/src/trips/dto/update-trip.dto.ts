@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsDateString } from 'class-validator';
+import { IsString, IsOptional, IsDateString, IsBoolean } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class UpdateTripDto {
@@ -23,7 +23,6 @@ export class UpdateTripDto {
   endDate?: string;
 
   @IsOptional()
-  @IsString()
-  @ApiProperty({ required: false , example: 'https://example.com/image.jpg' })
-  imageUrl?: string;
+  @IsBoolean()
+  isPublic?: boolean;
 }

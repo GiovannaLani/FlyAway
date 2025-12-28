@@ -30,6 +30,7 @@ function proxyTo(target) {
 
 app.use("/api/users", proxyTo(USERS_TRIPS));
 app.use("/api/trips", proxyTo(USERS_TRIPS));
+app.use("/api/itinerary", proxyTo(USERS_TRIPS));
 
 app.get("/health", (req, res) => res.json({ status: "ok", service: "api-gateway" }));
 

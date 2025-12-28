@@ -30,4 +30,9 @@ export class CreateTripDto {
     @IsString()
     @ApiProperty({ example: '/uploads/summer-vacation.jpg', required: false })
     imageUrl?: string;
+
+    @IsOptional()
+    @IsString()
+    @ApiProperty({ example: 'true', required: false })
+    isPublic?: boolean;
 }

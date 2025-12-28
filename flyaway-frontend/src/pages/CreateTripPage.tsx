@@ -26,6 +26,8 @@ export default function CreateTripPage() {
     const [friends, setFriends] = useState<Friend[]>([]);
     const [loadingFriends, setLoadingFriends] = useState(false);
 
+    const [isPublic, setIsPublic] = useState(false);
+
     const filteredFriends = friends.filter(
     f =>
         f.name.toLowerCase().includes(search.toLowerCase()) &&
@@ -43,8 +45,16 @@ export default function CreateTripPage() {
 
     const handleSubmit = async () => {
         if (!name.trim()) {
-        alert("El nombre del viaje es obligatorio");
-        return;
+            alert("El nombre del viaje es obligatorio");
+            return;
+        }
+        if(!startDate){
+            alert("La fecha de inicio es obligatoria");
+            return;
+        }
+        if(endDate && startDate && endDate <  startDate) {
+            alert("La fecha de fin no puede ser anterior a la fecha de inicio");
+            return;
         }
 
         const formData = new FormData();
@@ -63,6 +73,8 @@ export default function CreateTripPage() {
             JSON.stringify(participants.map(p => p.email))
         );
 
+        formData.append("isPublic", String(isPublic));
+        
         try {
             await client.post("/trips", formData, {
             headers: {
@@ -232,6 +244,29 @@ export default function CreateTripPage() {
                 ))}
                 </ListGroup>
             )}
+
+            <ListGroup className="mt-4">
+                <ListGroupItem className="d-flex align-items-center justify-content-between">
+                    <div className="text-start">
+                    <strong>Privacidad del viaje</strong>
+                    <div className="text-muted small">
+                        Define si otros usuarios pueden ver este viaje
+                    </div>
+                    </div>
+
+                    <div className="form-check form-switch">
+                    <Input
+                        type="switch"
+                        id="privacySwitch"
+                        checked={isPublic}
+                        onChange={() => setIsPublic(prev => !prev)}
+                    />
+                    <Label for="privacySwitch" className="ms-2 mb-0">
+                        {isPublic ? "Público" : "Privado"}
+                    </Label>
+                    </div>
+                </ListGroupItem>
+            </ListGroup>
 
             <div className="d-flex justify-content-end mt-4">
                 <Button color="primary" onClick={handleSubmit}>

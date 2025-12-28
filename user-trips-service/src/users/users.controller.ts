@@ -30,6 +30,14 @@ export class UsersController {
         );
     }
 
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth()
+    @ApiOperation({ summary: 'Get authenticated user details' })
+    @Get('me')
+    getMe(@Req() req) {
+        return req.user;
+    }
+
     @ApiBearerAuth()
     @UseGuards(JwtAuthGuard)
     @ApiOperation({ summary: 'Add a friend by email' })
