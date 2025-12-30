@@ -9,7 +9,7 @@ export default function LoginPage() {
 
   const handleLogin = async (email: string, password: string) => {
     try {
-      const res = await client.post("/users/login", { email, password });
+      const res = await client.post("/auth/login", { email, password });
       const token = res.data.token;
       if (token) {
         login(token);
@@ -22,9 +22,13 @@ export default function LoginPage() {
     }
   };
 
+  const handleGoogleSignIn = () => {
+    window.location.href = `http://localhost:3030/api/auth/google`;
+  }
+
   return (
     <div className="d-flex justify-content-center align-items-center vh-100">
-      <LoginForm onSubmit={handleLogin} />
+      <LoginForm onSubmit={handleLogin} onGoogleSignIn={handleGoogleSignIn} />
     </div>
   );
 }

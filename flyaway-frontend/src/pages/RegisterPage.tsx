@@ -7,16 +7,20 @@ export default function RegisterPage() {
 
   const handleRegister = async (name: string, email: string, password: string) => {
     try {
-      await client.post("/users/register", { name, email, password });
+      await client.post("/auth/register", { name, email, password });
       navigate("/login");
     } catch (err: any) {
       alert(err.response?.data?.message || err.message);
     }
   };
 
+  const handleGoogleSignIn = () => {
+    window.location.href = `http://localhost:3030/api/auth/google`;
+  }
+
   return (
     <div className="d-flex justify-content-center align-items-center vh-100">
-      <RegisterForm onSubmit={handleRegister} />
+      <RegisterForm onSubmit={handleRegister} onGoogleSignIn={handleGoogleSignIn} />
     </div>
   );
 }

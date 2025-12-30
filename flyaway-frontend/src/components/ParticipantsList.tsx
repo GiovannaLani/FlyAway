@@ -1,11 +1,14 @@
 import { useState } from "react";
 import {ListGroup, ListGroupItem, Button, Badge, Input, Modal, ModalHeader, ModalBody, ModalFooter, } from "reactstrap";
+import defaultAvatarImage from "../assets/default-profile-avatar.jpg";
+import { useNavigate } from "react-router-dom";
 
 export type Participant = {
   id: number;
   name: string;
   email: string;
   role: "admin" | "member";
+  avatarUrl?: string;
 };
 
 type Props = {
@@ -17,6 +20,7 @@ type Props = {
 };
 
 export default function ParticipantsList({ participants, currentUserId, onChangeRole, onRemove, onLeave}: Props) {
+  const nav = useNavigate();
   const currentUser = participants.find(p => p.id === currentUserId);
   const isAdmin = currentUser?.role === "admin";
   const isSelf = (userId: number) => userId === currentUserId;
@@ -30,8 +34,24 @@ export default function ParticipantsList({ participants, currentUserId, onChange
         {participants.map(p => (
           <ListGroupItem key={p.id} className="d-flex justify-content-between align-items-center">
             <div className="text-start">
-              <strong>{p.name}</strong>
-              <div className="text-muted small">{p.email}</div>
+              <div key={p.id} className="d-flex align-items-center justify-content-between py-2" style={{ cursor: "pointer" }} onClick={() => nav(`/users/${p.id}`)}>
+                <div className="d-flex align-items-center gap-3">
+                  <img
+                    src={p.avatarUrl ? `http://localhost:3001${p.avatarUrl}` : defaultAvatarImage}
+                    alt="avatar"
+                    style={{
+                      width: 48,
+                      height: 48,
+                      borderRadius: "50%",
+                      objectFit: "cover",
+                    }}
+                  />
+                  <div>
+                    <strong>{p.name}</strong>
+                    <div className="text-muted small">{p.email}</div>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div className="d-flex align-items-center gap-2">

@@ -26,7 +26,7 @@ export default function TabPaneImages({ days }: Props) {
     <div className="mt-3">
       {days.map(day => {
         const images = day.activities.flatMap(a => a.images ?? []);
-        if (images.length === 0) return <p>No hay imágenes</p>;
+        if (images.length === 0) return null;
 
         return (
           <div key={day.id} className="mb-5">

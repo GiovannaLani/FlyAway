@@ -48,7 +48,6 @@ export class TripsController {
             imageUrl: file ? `/uploads/${Date.now()}-${file.originalname}` : undefined,
             participants: body.participants ? JSON.parse(body.participants) : [],
         };
-        console.log('participants:', dto.participants);
 
         return this.tripsService.createTrip(req.user.id, dto, file);
     }
@@ -120,6 +119,7 @@ export class TripsController {
     getParticipants(@Req() req, @Param('id') id: number) {
         return this.tripsService.getParticipants(req.user.id, id);
     }
+
     @Patch(':id/start-date')
     updateStartDate(
         @Req() req,

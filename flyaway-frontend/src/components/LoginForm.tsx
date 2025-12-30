@@ -3,9 +3,10 @@ import type { FormEvent } from "react";
 
 type Props = {
   onSubmit: (email: string, password: string) => void;
+  onGoogleSignIn?: () => void;
 };
 
-export default function LoginForm({ onSubmit }: Props) {
+export default function LoginForm({ onSubmit, onGoogleSignIn }: Props) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -49,14 +50,14 @@ export default function LoginForm({ onSubmit }: Props) {
 
       <hr className="my-4" />
 
-      <button className="btn btn-outline-danger w-100">
+      <button className="btn btn-outline-danger w-100" onClick={onGoogleSignIn}>
         <img
           src="https://developers.google.com/identity/images/g-logo.png"
           alt="Google"
           width="18"
           className="me-2"
         />
-        Iniciar sesión con Google
+        Continuar con Google
       </button>
 
       <div className="text-center mt-3">

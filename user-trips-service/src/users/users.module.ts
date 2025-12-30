@@ -9,12 +9,12 @@ import { UserTrip } from 'src/user-trips/user-trip.model';
 import { Friendship } from './friendship.model';
 
 @Module({
-  imports: [SequelizeModule.forFeature([User]), 
-    SequelizeModule.forFeature([Friendship]),
+  imports: [
+    SequelizeModule.forFeature([User, Friendship, UserTrip, Trip]),
     forwardRef(() => AuthModule),
-    SequelizeModule.forFeature([User, UserTrip, Trip]),],
+  ],
   controllers: [UsersController],
   providers: [UsersService],
-  exports: [UsersService]
+  exports: [UsersService],
 })
 export class UsersModule {}

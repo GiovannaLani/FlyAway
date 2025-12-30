@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Card, CardBody, Row, Col, Form, FormGroup, Input, Label, Button, ListGroup, ListGroupItem } from "reactstrap";
 import { useNavigate } from "react-router-dom";
 import client from "../api/client";
+import { useAuth } from "../auth/AuthProvider";
 
 type Friend = {
   id: number;
@@ -27,6 +28,7 @@ export default function CreateTripPage() {
     const [loadingFriends, setLoadingFriends] = useState(false);
 
     const [isPublic, setIsPublic] = useState(false);
+    const { me } = useAuth();
 
     const filteredFriends = friends.filter(
     f =>
@@ -82,7 +84,7 @@ export default function CreateTripPage() {
             },
             });
 
-            nav("/trips");
+            nav(`/users/${me?.id}`);
         } catch (err: any) {
             alert(err.response?.data?.message || err.message);
         }
@@ -105,7 +107,7 @@ export default function CreateTripPage() {
     }, []);
 
     return (
-        <Card className="shadow">
+        <Card className="border-0">
         <CardBody>
             <h3 className="mb-4">Crear nuevo viaje</h3>
 

@@ -5,11 +5,15 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import HomePage from "./pages/HomePage";
-import TripsPage from "./pages/TripsPage";
 import { useAuth } from "./auth/AuthProvider";
 import Header from "./components/Header";
 import CreateTripPage from './pages/CreateTripPage';
 import TripDetailPage from './pages/TripDetailPage';
+import UserProfilePage from './pages/UserProfilePage';
+import Footer from './components/Footer';
+import EditProfilePage from './pages/EditProfilePage';
+import FriendsPage from './pages/FriendsPage';
+import BackLayout from './components/BackLayout';
 
 function PrivateRoute({ children }: { children: JSX.Element }) {
   const { token } = useAuth();
@@ -17,12 +21,17 @@ function PrivateRoute({ children }: { children: JSX.Element }) {
 }
 
 function App() {
+
   return (
     <>
       <BrowserRouter>
+      <div className="app-layout">
+
         <div className="pt-5">
           <Header />
         </div>
+        <main className="flex-grow-1">
+
         <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
@@ -30,17 +39,7 @@ function App() {
         <Route
           path="/"
           element={
-            <PrivateRoute>
               <HomePage />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/trips"
-          element={
-            <PrivateRoute>
-              <TripsPage />
-            </PrivateRoute>
           }
         />
 
@@ -48,7 +47,9 @@ function App() {
           path="/trips/new"
           element={
             <PrivateRoute>
-              <CreateTripPage />
+              <BackLayout>
+                <CreateTripPage />
+              </BackLayout>
             </PrivateRoute>
           }
         />
@@ -57,13 +58,43 @@ function App() {
           path="/trips/:tripId"
           element={
             <PrivateRoute>
-              <TripDetailPage />
+              <BackLayout>
+                <TripDetailPage />
+              </BackLayout>
             </PrivateRoute>
           }
         />
 
+        <Route path="/users/:userId" element={
+          <PrivateRoute>
+            <BackLayout>
+              <UserProfilePage />
+            </BackLayout>
+          </PrivateRoute>
+        } />
+
+        <Route path="/profile/edit" element={
+          <PrivateRoute>
+            <BackLayout>
+              <EditProfilePage />
+            </BackLayout>
+          </PrivateRoute>
+        } />
+
+        <Route path="/friends" element={
+          <PrivateRoute>
+            <BackLayout>
+              <FriendsPage />
+            </BackLayout>
+          </PrivateRoute>
+        } />
+
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+              </main>
+
+      <Footer />
+      </div>
     </BrowserRouter>
     </>
   )

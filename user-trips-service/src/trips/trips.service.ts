@@ -10,6 +10,8 @@ import * as fs from 'fs';
 import { TripDay } from 'src/itinerary/trip-day.model';
 import { Sequelize } from 'sequelize-typescript/dist/sequelize/sequelize/sequelize';
 import { Activity } from 'src/itinerary/activity.model';
+import { Friendship } from 'src/users/friendship.model';
+import { Op } from 'sequelize';
 
 
 @Injectable()
@@ -18,6 +20,7 @@ export class TripsService {
         @InjectModel(Trip) private tripModel: typeof Trip,
         @InjectModel(UserTrip) private userTripModel: typeof UserTrip,
         @InjectModel(User) private userModel: typeof User,
+        @InjectModel(Friendship) private friendshipModel: typeof Friendship,
         @InjectModel(TripDay) private dayModel: typeof TripDay,
         @InjectModel(Activity) private activityModel: typeof Activity,
         private readonly sequelize: Sequelize
@@ -91,16 +94,38 @@ export class TripsService {
         return relations.map(r => r.trip);
     }
 
-    async getTripById(userId: number, tripId: number) {
-        const userTrip = await this.userTripModel.findOne({
-            where: { userId, tripId },
-            include: [{ model: Trip }],
-        });
+    async getTripById(viewerId: number, tripId: number) {
+        const trip = await this.tripModel.findByPk(tripId, { include: [UserTrip] });
+        if (!trip) throw new NotFoundException('Trip not found');
 
-        if (!userTrip)
-        throw new NotFoundException('Trip not found or not allowed');
+        const userTrip = trip.userTrips.find(ut => ut.userId === viewerId);
+        const isAdmin = userTrip?.role === 'admin';
+        const isParticipant = !!userTrip;
 
-        const trip = userTrip.trip;
+        const ownerId = trip.userTrips.find(ut => ut.role === 'admin')?.userId;
+        let isFriend = false;
+        if (!isAdmin && !isParticipant && ownerId && ownerId !== viewerId) {
+            const friendship = await this.friendshipModel.findOne({
+            where: {
+                status: 'accepted',
+                [Op.or]: [
+                { userId: ownerId, friendId: viewerId },
+                { userId: viewerId, friendId: ownerId },
+                ],
+            },
+            });
+            isFriend = !!friendship;
+        }
+
+        const canEdit = isAdmin;
+        const canViewItinerary = isAdmin || isParticipant;
+        const canViewParticipants = isAdmin || isParticipant || (isFriend && trip.isPublic);
+        const canViewImages = isAdmin || isParticipant || trip.isPublic;
+        const canViewExpenses = isAdmin || isParticipant;
+
+        if (!canViewImages && !canViewParticipants && !canViewItinerary && !canEdit && !canViewExpenses) {
+            throw new ForbiddenException();
+        }
 
         return {
             id: trip.id,
@@ -109,15 +134,18 @@ export class TripsService {
             imageUrl: trip.imageUrl,
             isPublic: trip.isPublic,
             startDate: trip.startDate,
-            role: userTrip.role
+            role: userTrip?.role || null,
+            permissions: {
+                canEdit,
+                canViewItinerary,
+                canViewParticipants,
+                canViewImages,
+                canViewExpenses
+            },
         };
     }
 
-    async updateTrip(
-        userId: number,
-        tripId: number,
-        dto: UpdateTripDto
-    ) {
+    async updateTrip( userId: number, tripId: number, dto: UpdateTripDto ) {
         const relation = await this.userTripModel.findOne({
             where: { userId, tripId, role: 'admin' },
             include: [{ model: Trip }],
@@ -272,12 +300,6 @@ export class TripsService {
     }
 
     async getParticipants(userId: number, tripId: number) {
-        const allowed = await this.userTripModel.findOne({
-            where: { userId, tripId }
-        });
-
-        if (!allowed)
-        throw new ForbiddenException('Not allowed');
 
         const participants = await this.userTripModel.findAll({
             where: { tripId },

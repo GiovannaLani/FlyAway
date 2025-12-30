@@ -23,7 +23,6 @@ export class ItineraryService {
   }
 
   async getItinerary(userId: number, tripId: number) {
-    await this.checkAccess(userId, tripId);
 
     return this.dayModel.findAll({
         where: { tripId },

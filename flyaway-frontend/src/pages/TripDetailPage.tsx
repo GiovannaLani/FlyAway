@@ -10,7 +10,7 @@ import TabPaneSettings from "../components/TabPaneSettings";
 
 export default function TripDetailPage() {
   const { tripId } = useParams<{ tripId: string }>();
-  const [activeTab, setActiveTab] = useState("itinerary");
+  const [activeTab, setActiveTab] = useState<string>("");
   const [tripName, setTripName] = useState("");
   const [description, setDescription] = useState("");
   const [isPublic, setIsPublic] = useState(false);
@@ -18,6 +18,13 @@ export default function TripDetailPage() {
   const [role, setRole] = useState<"admin" | "member" | null>(null);
   const [days, setDays] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  const [permissions, setPermissions] = useState({
+    canEdit: false,
+    canViewItinerary: false,
+    canViewParticipants: false,
+    canViewImages: false,
+    canViewExpenses: false,
+  });
 
   useEffect(() => {
     async function fetchTrip() {
@@ -28,6 +35,8 @@ export default function TripDetailPage() {
         setIsPublic(res.data.isPublic);
         setImageUrl(res.data.imageUrl);
         setRole(res.data.role);
+        setTripName(res.data.name);
+        setPermissions(res.data.permissions);
       } catch (err: any) {
         alert(err.response?.data?.message || err.message);
       }
@@ -51,42 +60,66 @@ export default function TripDetailPage() {
     }
   }, [tripId]);
 
+  useEffect(() => {
+    const firstTab = permissions.canViewItinerary
+      ? "itinerary"
+      : permissions.canViewParticipants
+      ? "participants"
+      : permissions.canViewImages
+      ? "images"
+      : permissions.canViewExpenses
+      ? "expenses"
+      : "";
+
+    setActiveTab(firstTab);
+  }, [permissions]);
+
   if (!tripId) return <p>ID del viaje no encontrado</p>;
 
   return (
     <div className="container mt-4 pb-4">
+      
       <h1 className="text-center mb-4">{tripName || "Cargando..."}</h1>
       <Nav tabs>
-        <NavItem>
-          <NavLink className={classnames({ active: activeTab === "itinerary" })} onClick={() => setActiveTab("itinerary")} style={{ cursor: "pointer" }}>
-            Itinerario
-          </NavLink>
-        </NavItem>
+        {permissions.canViewItinerary && (
+          <NavItem>
+            <NavLink className={classnames({ active: activeTab === "itinerary" })} onClick={() => setActiveTab("itinerary")} style={{ cursor: "pointer" }} >
+              Itinerario
+            </NavLink>
+          </NavItem>
+        )}
 
-        <NavItem>
-          <NavLink className={classnames({ active: activeTab === "participants" })} onClick={() => setActiveTab("participants")} style={{ cursor: "pointer" }}>
-            Participantes
-          </NavLink>
-        </NavItem>
+        {permissions.canViewParticipants && (
+          <NavItem>
+            <NavLink className={classnames({ active: activeTab === "participants" })} onClick={() => setActiveTab("participants")} style={{ cursor: "pointer" }} >
+              Participantes
+            </NavLink>
+          </NavItem>
+        )}
 
-        <NavItem>
-          <NavLink className={classnames({ active: activeTab === "expenses" })} onClick={() => setActiveTab("expenses")} style={{ cursor: "pointer" }}>
-            Gastos
-          </NavLink>
-        </NavItem>
+        {permissions.canViewExpenses && (
+          <NavItem>
+            <NavLink className={classnames({ active: activeTab === "expenses" })} onClick={() => setActiveTab("expenses")} style={{ cursor: "pointer" }} >
+              Gastos
+            </NavLink>
+          </NavItem>
+        )}
 
-        <NavItem>
-          <NavLink className={classnames({ active: activeTab === "images" })} onClick={() => setActiveTab("images")} style={{ cursor: "pointer" }}>
-            Imágenes
-          </NavLink>
-        </NavItem>
+        {permissions.canViewImages && (
+          <NavItem>
+            <NavLink className={classnames({ active: activeTab === "images" })} onClick={() => setActiveTab("images")} style={{ cursor: "pointer" }} >
+              Imágenes
+            </NavLink>
+          </NavItem>
+        )}
 
-        {role === "admin" && (
-        <NavItem>
-          <NavLink className={classnames({ active: activeTab === "settings" })} onClick={() => setActiveTab("settings")} style={{ cursor: "pointer" }}>
-            Ajustes
-          </NavLink>
-        </NavItem>)}
+        {role === "admin" && permissions.canEdit && (
+          <NavItem>
+            <NavLink className={classnames({ active: activeTab === "settings" })} onClick={() => setActiveTab("settings")} style={{ cursor: "pointer" }} >
+              Ajustes
+            </NavLink>
+          </NavItem>
+        )}
       </Nav>
 
       <TabContent activeTab={activeTab} className="mt-4">

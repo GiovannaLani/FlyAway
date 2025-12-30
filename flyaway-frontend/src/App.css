@@ -61,3 +61,19 @@ html, body, #root {
 .read-the-docs {
   color: #888;
 }
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+.app-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1;
+}
