@@ -1,0 +1,43 @@
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.log
+*.sqlite3
+
+# ===== Virtualenv =====
+venv/
+.env
+.env.*
+.python-version
+
+# ===== FastAPI / Uvicorn =====
+*.pid
+
+# ===== IDEs =====
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ===== OS =====
+.DS_Store
+Thumbs.db
+
+# ===== Mongo =====
+data/
+mongo-data/
+
+# ===== Docker =====
+docker-compose.override.yml
+
+# ===== Tests =====
+.pytest_cache/
+.coverage
+htmlcov/
+
+# ===== Build =====
+dist/
+build/
+*.egg-info/

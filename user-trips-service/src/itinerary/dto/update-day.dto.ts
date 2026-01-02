@@ -5,5 +5,10 @@ export class UpdateDayDto {
   @ApiPropertyOptional({ example: 'Roma' })
   @IsOptional()
   @IsString()
-  destination?: string;
+  destinationName?: string;
+
+  @ApiPropertyOptional({ example: 'ChIJu46S-ZZhLxMROG5lkwZ3D7k' })
+  @IsOptional()
+  @IsString()
+  destinationPlaceId?: string; 
 }

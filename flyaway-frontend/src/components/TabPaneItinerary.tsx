@@ -3,6 +3,7 @@ import { Row, Col, Accordion, Button, Input, Modal, ModalHeader, ModalBody, Moda
 import client from "../api/client";
 import ItineraryDay from "./ItineraryDay";
 import ActivityPanel from "./ActivityPanel";
+import RecommendationsPanel from "./RecommendationsPanel";
 
 export type Activity = {
   id: number;
@@ -18,7 +19,8 @@ export type Activity = {
 export type Day = {
   id: number;
   date: string;
-  destination?: string;
+  destinationPlaceId?: string;
+  destinationName?: string;
   activities: Activity[];
 };
 
@@ -78,12 +80,12 @@ export default function TabPaneItinerary({ tripId, days, setDays, loading}: Prop
     closeDeleteModal();
   };
 
-  const updateLocalDestination = (id: number, value: string) => {
-    setDays(prev =>prev.map(d => d.id === id ? { ...d, destination: value } : d));
+  const updateLocalDestination = (id: number, value: string, placeId: string) => {
+    setDays(prev =>prev.map(d => d.id === id ? { ...d, destinationName: value, destinationPlaceId: placeId } : d));
   };
 
-  const saveDestination = async (id: number, value: string) => {
-    await client.patch(`/itinerary/days/${id}`, { destination: value});
+  const saveDestination = async (id: number, destinationPlaceId: string, destinationName: string) => {
+    await client.patch(`/itinerary/days/${id}`, { destinationPlaceId: destinationPlaceId, destinationName: destinationName } );
   };
 
   const addMinutes = (time: string, minutes: number) => {
@@ -183,7 +185,7 @@ export default function TabPaneItinerary({ tripId, days, setDays, loading}: Prop
 
   return (
     <Row>
-      <Col md={4}>
+      <Col md={4} className="itinerary-scroll">
         <div className="mb-3 text-center">
           {!editingStart ? (
             <>
@@ -254,7 +256,7 @@ export default function TabPaneItinerary({ tripId, days, setDays, loading}: Prop
       </Col>
 
       <Col md={8}>
-        <div style={{ position: "sticky", top: 0 }}>
+        <div>
           <ActivityPanel
             selectedActivity={selectedActivity}
             isEditing={isEditing}
@@ -266,6 +268,18 @@ export default function TabPaneItinerary({ tripId, days, setDays, loading}: Prop
           />
         </div>
       </Col>
+      {selectedActivity && (() => {
+        console.log("Selected Activity:", selectedActivity);
+        const dayOfSelectedActivity = days.find(d => {
+          console.log("Checking day:", d);
+          return d.activities.some(a => a.id === selectedActivity.id);
+        });
+        console.log("Day of Selected Activity:", dayOfSelectedActivity);
+
+        return dayOfSelectedActivity?.destinationPlaceId ? (
+          <RecommendationsPanel placeId={dayOfSelectedActivity.destinationPlaceId} />
+        ) : null;
+      })()}
 
       <Modal isOpen={deleteDayId !== null} toggle={closeDeleteModal} centered>
         <ModalHeader toggle={closeDeleteModal}>

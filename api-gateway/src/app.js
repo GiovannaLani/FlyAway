@@ -10,6 +10,7 @@ app.use(morgan("dev"));
 
 const PORT = process.env.PORT || 3030;
 const USERS_TRIPS = process.env.USERS_TRIPS_SERVICE || "http://localhost:3001";
+const EXTERNAL_DATA = process.env.EXTERNAL_DATA_SERVICE || "http://localhost:3002";
 
 function proxyTo(target) {
   return createProxyMiddleware({
@@ -33,9 +34,12 @@ app.use("/api/users", proxyTo(USERS_TRIPS));
 app.use("/api/trips", proxyTo(USERS_TRIPS));
 app.use("/api/itinerary", proxyTo(USERS_TRIPS));
 
+app.use("/api/external", proxyTo(EXTERNAL_DATA));
+
 app.get("/health", (req, res) => res.json({ status: "ok", service: "api-gateway" }));
 
 app.listen(PORT, () => {
   console.log(`API Gateway running on http://localhost:${PORT}`);
   console.log(`- users_trips -> ${USERS_TRIPS}`);
+  console.log(`- external_data -> ${EXTERNAL_DATA}`);
 });

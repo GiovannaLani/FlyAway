@@ -53,7 +53,7 @@ export class ItineraryService {
     }
 
     await this.checkAccess(userId, day.tripId);
-    await day.update({destination: dto.destination});
+    await day.update({destinationName: dto.destinationName, destinationPlaceId: dto.destinationPlaceId});
 
     return day;
   }

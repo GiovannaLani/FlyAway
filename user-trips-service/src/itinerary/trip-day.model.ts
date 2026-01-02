@@ -12,7 +12,10 @@ export class TripDay extends Model {
     declare date: string;
 
     @Column({ allowNull: true })
-    declare destination?: string;
+    declare destinationPlaceId?: string;
+
+    @Column({ allowNull: true })
+    declare destinationName?: string;
 
     @HasMany(() => Activity, { as: 'activities' })
     declare activities: Activity[];
