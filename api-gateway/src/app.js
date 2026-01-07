@@ -33,6 +33,7 @@ app.use("/api/auth", proxyTo(USERS_TRIPS));
 app.use("/api/users", proxyTo(USERS_TRIPS));
 app.use("/api/trips", proxyTo(USERS_TRIPS));
 app.use("/api/itinerary", proxyTo(USERS_TRIPS));
+app.use("/api/expenses", proxyTo(USERS_TRIPS));
 
 app.use("/api/external", proxyTo(EXTERNAL_DATA));
 

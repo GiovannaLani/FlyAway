@@ -7,6 +7,7 @@ import TabPaneParticipants from "../components/TabPaneParticipants";
 import TabPaneItinerary from "../components/TabPaneItinerary";
 import TabPaneImages from "../components/TabPaneImages";
 import TabPaneSettings from "../components/TabPaneSettings";
+import TabPaneExpenses from "../components/TabPaneExpenses";
 
 export default function TripDetailPage() {
   const { tripId } = useParams<{ tripId: string }>();
@@ -132,7 +133,7 @@ export default function TripDetailPage() {
         </TabPane>
 
         <TabPane tabId="expenses">
-          <p>Gastos (pendiente)</p>
+          <TabPaneExpenses tripId={Number(tripId)} />
         </TabPane>
 
         <TabPane tabId="images">
