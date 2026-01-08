@@ -1,0 +1,71 @@
+
+services:
+  mongo:
+    image: mongo:6
+    container_name: flyaway-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+      - ./mongo-init:/docker-entrypoint-initdb.d
+    environment:
+      MONGO_INITDB_DATABASE: flyaway
+
+  mysql:
+    image: mysql:8
+    container_name: flyaway-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: flyaway
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  external-data-service:
+    build: ./external-data-service
+    container_name: external-data-service
+    depends_on:
+      - mongo
+    environment:
+      MONGO_URI: mongodb://mongo:27017/flyaway
+    ports:
+      - "3002:3002"
+
+  user-trips-service:
+    build: ./user-trips-service
+    container_name: user-trips-service
+    depends_on:
+      - mysql
+    environment:
+      DB_NAME: flyaway
+      DB_USER: root
+      DB_PASS: root
+      DB_HOST: mysql
+      JWT_SECRET: supersecreto
+      PORT: 3001
+    ports:
+      - "3001:3001"
+
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    depends_on:
+      - user-trips-service
+      - external-data-service
+    environment:
+      PORT: 3030
+      USERS_TRIPS_SERVICE: http://user-trips-service:3001
+      EXTERNAL_DATA_SERVICE: http://external-data-service:3002
+    ports:
+      - "3030:3030"
+
+  frontend:
+    build: ./flyaway-frontend
+    container_name: flyaway-frontend
+    depends_on:
+      - api-gateway
+    ports:
+      - "5173:80"
+
+volumes:
+  mongo_data:
+  mysql_data:

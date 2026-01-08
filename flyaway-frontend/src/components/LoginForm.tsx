@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
+import { Link } from "react-router";
 
 type Props = {
   onSubmit: (email: string, password: string) => void;
@@ -61,7 +62,7 @@ export default function LoginForm({ onSubmit, onGoogleSignIn }: Props) {
       </button>
 
       <div className="text-center mt-3">
-        <a href="/register">¿No tienes cuenta? Regístrate</a>
+        <Link to="/register">¿No tienes cuenta? Regístrate</Link>
       </div>
     </div>
   );

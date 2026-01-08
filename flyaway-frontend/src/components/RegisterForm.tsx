@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router";
 
 type Props = {
     onSubmit: (name: string, email: string, password: string) => void;
@@ -76,7 +77,7 @@ export default function RegisterForm({ onSubmit, onGoogleSignIn }: Props) {
             </button>
 
             <div className="text-center mt-3">
-                <a href="/login">¿Ya tienes cuenta? Inicia sesión</a>
+                <Link to="/login">¿Ya tienes cuenta? Inicia sesión</Link>
             </div>
         </div>
     );

@@ -86,9 +86,7 @@ def get_place_recommendations(place_id: str, limit: int = 9):
         "place_id": mongo_id,
         "radius": DEFAULT_RADIUS,
         "limit": limit,
-        "created_at": {
-            "$gte": datetime.utcnow() - timedelta(hours=CACHE_HOURS)
-        }
+        "expires_at": {"$gt": datetime.utcnow()}
     })
 
     if cache:
@@ -169,7 +167,7 @@ def get_place_recommendations(place_id: str, limit: int = 9):
         "radius": DEFAULT_RADIUS,
         "limit": limit,
         "items": items,
-        "created_at": datetime.utcnow()
+        "expires_at": datetime.utcnow() + timedelta(hours=CACHE_HOURS)
     })
 
     return {

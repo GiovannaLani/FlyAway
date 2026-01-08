@@ -12,9 +12,9 @@ const PORT = process.env.PORT || 3030;
 const USERS_TRIPS = process.env.USERS_TRIPS_SERVICE || "http://localhost:3001";
 const EXTERNAL_DATA = process.env.EXTERNAL_DATA_SERVICE || "http://localhost:3002";
 
-function proxyTo(target) {
+function proxyTo(target, endpoint = "/") {
   return createProxyMiddleware({
-    target,
+    target: target + endpoint,
     changeOrigin: true,
     logLevel: "debug",
     onProxyReq(proxyReq, req) {
@@ -29,13 +29,13 @@ function proxyTo(target) {
   });
 }
 
-app.use("/api/auth", proxyTo(USERS_TRIPS));
-app.use("/api/users", proxyTo(USERS_TRIPS));
-app.use("/api/trips", proxyTo(USERS_TRIPS));
-app.use("/api/itinerary", proxyTo(USERS_TRIPS));
-app.use("/api/expenses", proxyTo(USERS_TRIPS));
+app.use("/api/auth", proxyTo(USERS_TRIPS, "/api/auth"));
+app.use("/api/users", proxyTo(USERS_TRIPS, "/api/users"));
+app.use("/api/trips", proxyTo(USERS_TRIPS, "/api/trips"));
+app.use("/api/itinerary", proxyTo(USERS_TRIPS, "/api/itinerary"));
+app.use("/api/expenses", proxyTo(USERS_TRIPS, "/api/expenses"));
 
-app.use("/api/external", proxyTo(EXTERNAL_DATA));
+app.use("/api/external", proxyTo(EXTERNAL_DATA, "/api/external"));
 
 app.get("/health", (req, res) => res.json({ status: "ok", service: "api-gateway" }));
 
