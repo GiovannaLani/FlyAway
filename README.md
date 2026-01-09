@@ -123,4 +123,4 @@ docker run -d --name flyaway-mongo -p 27017:27017 -v mongo_data:/data/db mongo:6
 ## Acceso
 Frontend: http://localhost:5173
 
-API Gateway: http://localhost:3030/api
+API Gateway: http://localhost:3030/docs

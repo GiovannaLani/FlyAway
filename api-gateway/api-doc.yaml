@@ -1,0 +1,18 @@
+openapi: 3.0.3
+info:
+  title: FlyAway API Gateway
+  description: Documentación unificada de la plataforma FlyAway
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:3030
+
+tags:
+  - name: Users & Trips
+    description: Gestión de usuarios, viajes, itinerarios y gastos
+  - name: External Data
+    description: Datos externos y recomendaciones
+
+externalDocs:
+  description: OpenAPI de los microservicios
+  url: /docs/services

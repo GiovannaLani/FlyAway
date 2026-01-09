@@ -8,6 +8,9 @@ const app = express();
 app.use(cors());
 app.use(morgan("dev"));
 
+const swaggerUi = require("swagger-ui-express");
+const { getMergedOpenApi } = require("./swagger");
+
 const PORT = process.env.PORT || 3030;
 const USERS_TRIPS = process.env.USERS_TRIPS_SERVICE || "http://localhost:3001";
 const EXTERNAL_DATA = process.env.EXTERNAL_DATA_SERVICE || "http://localhost:3002";
@@ -38,6 +41,16 @@ app.use("/api/expenses", proxyTo(USERS_TRIPS, "/api/expenses"));
 app.use("/api/external", proxyTo(EXTERNAL_DATA, "/api/external"));
 
 app.get("/health", (req, res) => res.json({ status: "ok", service: "api-gateway" }));
+
+let cachedSpec = null;
+
+app.use("/docs", swaggerUi.serve, async (req, res, next) => {
+  if (!cachedSpec) {
+    cachedSpec = await getMergedOpenApi();
+  }
+  return swaggerUi.setup(cachedSpec)(req, res, next);
+});
+
 
 app.listen(PORT, () => {
   console.log(`API Gateway running on http://localhost:${PORT}`);
