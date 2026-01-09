@@ -24,6 +24,7 @@ function App() {
 
   return (
     <>
+    <link rel="manifest" href="/manifest.json"></link>
       <BrowserRouter>
       <div className="app-layout">
 

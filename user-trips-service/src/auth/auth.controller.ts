@@ -35,8 +35,4 @@ export class AuthController {
     const { token } = await this.authService.googleLogin(req.user);
     res.redirect(`${process.env.FRONTEND_URL}/?token=${token}`);
   }
-  @Get("hello")
-  hello() {
-    return "Hello from AuthController";
-  }
 }
