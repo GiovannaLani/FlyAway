@@ -21,7 +21,6 @@ function PrivateRoute({ children }: { children: JSX.Element }) {
 }
 
 function App() {
-  console.log("API URL:", import.meta.env.VITE_API_URL);
 
   return (
     <>
