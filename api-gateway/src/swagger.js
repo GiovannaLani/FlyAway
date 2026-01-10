@@ -1,8 +1,11 @@
 const axios = require("axios");
 
+const USERS_TRIPS_URL = process.env.USERS_TRIPS_SERVICE;
+const EXTERNAL_DATA_URL = process.env.EXTERNAL_DATA_SERVICE;
+
 async function getMergedOpenApi() {
-  const usersTrips = await axios.get("http://localhost:3001/docs-json");
-  const external = await axios.get("http://localhost:3002/openapi.json");
+  const usersTrips = await axios.get(`${USERS_TRIPS_URL}/docs-json`);
+  const external = await axios.get(`${EXTERNAL_DATA_URL}/openapi.json`);
 
   const merged = {
     openapi: "3.0.3",
@@ -12,7 +15,7 @@ async function getMergedOpenApi() {
       version: "1.0.0"
     },
     servers: [
-      { url: "http://localhost:3030" }
+      { url: process.env.GATEWAY_URL || "http://localhost:3030" }
     ],
     paths: {
       ...usersTrips.data.paths,
