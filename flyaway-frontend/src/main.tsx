@@ -18,7 +18,8 @@ createRoot(document.getElementById('root')!).render(
 )
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-      console.log("API URL:", import.meta.env.VITE_API_URL);
+      console.log("API URL2:", import.meta.env.VITE_API_URL);
+      console.log("API URL2:", import.meta.env.VITE_ASSETS_URL);
 
     navigator.serviceWorker.register('/sw.js')
       .then(reg => console.log('SW registered', reg))

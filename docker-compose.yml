@@ -61,7 +61,11 @@ services:
       - "3030:3030"
 
   frontend:
-    build: ./flyaway-frontend
+    build: 
+      context: ./flyaway-frontend
+      args:
+        VITE_API_URL: http://localhost:3030/api
+        VITE_ASSETS_URL: http://localhost:3001
     container_name: flyaway-frontend
     depends_on:
       - api-gateway
