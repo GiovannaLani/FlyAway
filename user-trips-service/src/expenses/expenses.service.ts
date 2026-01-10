@@ -15,24 +15,22 @@ export class ExpensesService {
     ) {}
 
     async create(userId: number, dto: CreateExpenseDto) {
+        console.log('Creating expense with DTO:', dto);
         const rel = await this.userTripModel.findOne({where: { userId, tripId: dto.tripId }});
         if (!rel) throw new ForbiddenException();
 
-        const amount = dto.originalAmount;
-
         const expense = await this.expenseModel.create({
             name: dto.name,
-            originalAmount: dto.originalAmount,
             currency: dto.currency,
-            amount: amount,
+            amount: dto.amount,
             tripId: dto.tripId,
             paidByUserId: userId,
         });
 
         if (dto.splitType === 'EQUAL') {
+            console.log('Splitting expense equally among users');
             const users = await this.userTripModel.findAll({ where: { tripId: dto.tripId } });
-
-            const perUser = amount / users.length;
+            const perUser = dto.amount / users.length;
 
             for (const u of users) {
                 await this.splitModel.create({ expenseId: expense.id, userId: u.userId, amount: perUser });
@@ -49,12 +47,12 @@ export class ExpensesService {
                 throw new BadRequestException('Splits son requeridos');
             }
             const total = dto.splits.reduce((s, x) => s + x.amount, 0);
-            if (Math.abs(total - amount) > 0.01) {
+            if (Math.abs(total - dto.amount) > 0.01) {
                 throw new BadRequestException('La suma de splits no coincide');
             }
 
             for (const s of dto.splits) {
-                await this.splitModel.create({ expenseId: expense.id, userId: s.userId, amount: s.amount });
+                await this.splitModel.create({ expenseId: expense.id, userId: s.userId, amount: s.amount, settled: s.userId === userId });
             }
         }
 

@@ -45,7 +45,7 @@ export class UsersService {
       if (friend.id === userId) throw new BadRequestException('Cannot add yourself');
 
       const exists = await this.friendshipModel.findOne({
-        where: { userId, friendId: friend.id },
+        where: { userId, friendId: friend.id, status: 'accepted' }
       });
       if (exists) throw new BadRequestException('Already friends');
 

@@ -11,9 +11,6 @@ export class Expense extends Model {
   @Column({ type: DataType.FLOAT, allowNull: false })
   declare amount: number;
 
-  @Column({ type: DataType.FLOAT, allowNull: false })
-  declare originalAmount: number;
-
   @Column({ type: DataType.STRING, allowNull: false })
   declare currency: string;
 

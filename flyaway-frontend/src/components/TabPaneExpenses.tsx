@@ -17,8 +17,7 @@ interface ExpenseSplit {
 interface Expense {
   id: number;
   name: string;
-  amount: number; // EUR
-  originalAmount: number;
+  amount: number;
   currency: string;
   paidByUserId: number;
   paidBy: User;
@@ -108,7 +107,7 @@ export default function TabPaneExpenses({ tripId }: Props) {
 
         await client.post("/expenses", {
             name,
-            originalAmount: Number(amount),
+            amount: Number(amount),
             currency,
             tripId,
             splitType,
@@ -146,7 +145,7 @@ export default function TabPaneExpenses({ tripId }: Props) {
                 const expenseMap: Record<number, number> = {};
 
                 for (const e of expenses) {
-                    const converted = await convertCurrency(e.currency, displayCurrency,e.originalAmount);
+                    const converted = await convertCurrency(e.currency, displayCurrency,e.amount);
                     if (cancelled) return;
                     expenseMap[e.id] = converted;
                 }
@@ -286,7 +285,7 @@ export default function TabPaneExpenses({ tripId }: Props) {
                                     )}
 
                                     <div className="text-muted" style={{ fontSize: "0.8em" }}>
-                                        {e.originalAmount.toFixed(2)} {e.currency}
+                                        {e.amount.toFixed(2)} {e.currency}
                                     </div>
                                 </div>
                             </div>
@@ -297,16 +296,17 @@ export default function TabPaneExpenses({ tripId }: Props) {
                         <div className="accordion-body">
                             {e.splits.map((s) => (
                                 <div key={s.userId} className="d-flex justify-content-between align-items-center mb-2 p-2 border rounded">
-                                    <span>
-                                        {s.user.name}:{" "}
-                                        {converting ? (
-                                            <span className="placeholder col-4"></span>
-                                        ) : (
-                                            <strong>
-                                                {convertedAmounts[e.id]?.toFixed(2)} {currencySymbol[displayCurrency]}
-                                            </strong>
-                                        )}
-                                    </span> 
+                                        <span>
+                                            {s.user.name}:{" "}
+                                            {converting ? (
+                                                <span className="placeholder col-4"></span>
+                                            ) : (
+                                                <strong>
+                                                {(convertedAmounts[e.id] *(s.amount / e.amount)).toFixed(2)}{" "}
+                                                {currencySymbol[displayCurrency]}
+                                                </strong>
+                                            )}
+                                        </span>
                                     <div className="d-flex align-items-center gap-2">
                                         {s.settled && (
                                             <span className="badge bg-success">Pagado</span>

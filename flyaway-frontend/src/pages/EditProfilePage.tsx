@@ -83,12 +83,12 @@ export default function EditProfilePage() {
               </Col>
 
               <Col md={8}>
-                <FormGroup>
+                <FormGroup className="text-start">
                   <Label>Nombre</Label>
                   <Input value={name} onChange={(e) => setName(e.target.value)} />
                 </FormGroup>
 
-                <FormGroup className="mt-3">
+                <FormGroup className="mt-3 text-start">
                   <Label>Biografía</Label>
                   <Input type="textarea" rows={4} value={bio} onChange={(e) => setBio(e.target.value)} placeholder="Cuéntanos algo sobre ti..."/>
                 </FormGroup>

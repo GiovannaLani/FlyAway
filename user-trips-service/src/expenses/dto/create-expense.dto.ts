@@ -21,7 +21,7 @@ export class CreateExpenseDto {
   @IsNumber()
   @Min(0)
   @ApiProperty({ example: 150.75 })
-  originalAmount: number;
+  amount: number;
 
   @IsString()
   @ApiProperty({ example: 'USD' })
