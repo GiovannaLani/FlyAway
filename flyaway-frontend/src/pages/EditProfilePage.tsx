@@ -22,7 +22,7 @@ export default function EditProfilePage() {
       const res = await client.get("/users/me");
       setName(res.data.name);
       setBio(res.data.bio || "");
-      setPreview( res.data.avatarUrl ? `http://localhost:3001${res.data.avatarUrl}` : defaultAvatarImage);
+      setPreview( res.data.avatarUrl ? `${import.meta.env.VITE_ASSETS_URL}${res.data.avatarUrl}` : defaultAvatarImage);
     }
     loadProfile();
   }, [me]);

@@ -97,7 +97,7 @@ export default function FriendsPage() {
                     onClick={() => nav(`/users/${friend.id}`)}
                   >
                     <div className="d-flex align-items-center gap-3">
-                      <img src={friend.avatarUrl ? `http://localhost:3001${friend.avatarUrl}` : defaultAvatarImage}
+                      <img src={friend.avatarUrl ? `${import.meta.env.VITE_ASSETS_URL}${friend.avatarUrl}` : defaultAvatarImage}
                         alt="avatar"
                         style={{
                           width: 48,
@@ -151,7 +151,7 @@ export default function FriendsPage() {
                   <div key={req.id} className="d-flex align-items-center justify-content-between mb-3" >
                     <div className="d-flex align-items-center gap-2">
                       <img
-                        src={req.avatarUrl ? `http://localhost:3001${req.avatarUrl}` : defaultAvatarImage}
+                        src={req.avatarUrl ? `${import.meta.env.VITE_ASSETS_URL}${req.avatarUrl}` : defaultAvatarImage}
                         alt="avatar"
                         style={{
                           width: 40,

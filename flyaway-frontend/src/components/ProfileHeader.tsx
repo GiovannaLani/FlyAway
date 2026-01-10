@@ -7,7 +7,7 @@ type FriendStatus = "me" | "none" | "requested" | "friend";
 
 export default function ProfileHeader({user, friendStatus, setFriendStatus}: {user: any; friendStatus: FriendStatus; setFriendStatus: (s: FriendStatus) => void}) {
   const nav = useNavigate();
-  const avatar = user.avatarUrl && user.avatarUrl.length > 0 ? `http://localhost:3001${user.avatarUrl}` : defaultAvatarImage;
+  const avatar = user.avatarUrl && user.avatarUrl.length > 0 ? `${import.meta.env.VITE_ASSETS_URL}${user.avatarUrl}` : defaultAvatarImage;
 
   const handleAddFriend = async () => {
     await client.post("/users/friends", { email: user.email });

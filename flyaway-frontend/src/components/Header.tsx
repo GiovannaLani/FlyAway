@@ -60,7 +60,7 @@ export default function Header() {
                 <UncontrolledDropdown nav inNavbar>
                   <DropdownToggle nav caret className="d-flex align-items-center gap-2" >
                     <img
-                      src={ me.avatarUrl ? `http://localhost:3001${me.avatarUrl}` : defaultAvatar }
+                      src={me.avatarUrl ? `${import.meta.env.VITE_ASSETS_URL}${me.avatarUrl}` : defaultAvatar}
                       alt="avatar"
                       style={{
                         width: 32,

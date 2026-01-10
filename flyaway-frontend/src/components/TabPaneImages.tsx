@@ -38,7 +38,7 @@ export default function TabPaneImages({ days }: Props) {
             <div className="d-flex flex-wrap gap-2">
               {images.map((img, idx) => (
                 <div key={idx} className="image-card" style={{ width: 120, height: 120 }} onClick={() => setActiveImage(img)}>
-                  <img src={`http://localhost:3001${img}`} alt="actividad" style={{ width: "100%", height: "100%", objectFit: "cover" }}/>
+                  <img src={`${import.meta.env.VITE_ASSETS_URL}${img}`} alt="actividad" style={{ width: "100%", height: "100%", objectFit: "cover" }}/>
                 </div>
               ))}
             </div>
@@ -49,7 +49,7 @@ export default function TabPaneImages({ days }: Props) {
       <Modal isOpen={!!activeImage} toggle={() => setActiveImage(null)} centered size="lg">
         <div className="p-0 text-center bg-dark">
           {activeImage && (
-            <img src={`http://localhost:3001${activeImage}`} style={{ maxWidth: "100%", maxHeight: "90vh", objectFit: "contain" }} />
+            <img src={`${import.meta.env.VITE_ASSETS_URL}${activeImage}`} style={{ maxWidth: "100%", maxHeight: "90vh", objectFit: "contain" }} />
           )}
         </div>
       </Modal>

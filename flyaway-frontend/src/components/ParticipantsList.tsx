@@ -37,7 +37,7 @@ export default function ParticipantsList({ participants, currentUserId, onChange
               <div key={p.id} className="d-flex align-items-center justify-content-between py-2" style={{ cursor: "pointer" }} onClick={() => nav(`/users/${p.id}`)}>
                 <div className="d-flex align-items-center gap-3">
                   <img
-                    src={p.avatarUrl ? `http://localhost:3001${p.avatarUrl}` : defaultAvatarImage}
+                    src={p.avatarUrl ? `${import.meta.env.VITE_ASSETS_URL}${p.avatarUrl}` : defaultAvatarImage}
                     alt="avatar"
                     style={{
                       width: 48,

@@ -54,7 +54,7 @@ export default function ViewActivity({activity, onEdit, setSelectedActivity, upd
       <div className="d-flex flex-wrap gap-3 mt-2">
         {activity.images?.map(img => (
           <div key={img} className="position-relative image-wrapper">
-            <img src={`http://localhost:3001${img}`} style={{ width: 100, height: 100, objectFit: "cover", borderRadius: 6}}/>
+            <img src={`${import.meta.env.VITE_ASSETS_URL}${img}`} style={{ width: 100, height: 100, objectFit: "cover", borderRadius: 6}}/>
             <span className="image-remove" onClick={() => setRemoveImg(img)}>
               ✕
             </span>

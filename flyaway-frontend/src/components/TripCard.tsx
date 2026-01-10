@@ -25,7 +25,7 @@ export default function TripCard({ trip }: Props) {
     >
       <CardImg
         top
-        src={trip.imageUrl ? `http://localhost:3001${trip.imageUrl}` : defaultTripImage}
+        src={trip.imageUrl ? `${import.meta.env.VITE_ASSETS_URL}${trip.imageUrl}` : defaultTripImage}
         alt={trip.name}
         style={{ aspectRatio: "1 / 1", objectFit: "cover" }}
       />

@@ -17,6 +17,13 @@ La comunicación entre servicios se realiza a través del API Gateway.
 
 ## Configuración de variables de entorno (.env)
 
+### Frontend
+```
+VITE_API_URL=http://localhost:3030/api
+VITE_ASSETS_URL=http://localhost:3001
+```
+
+
 ### Gateway
 ```
 PORT=3030

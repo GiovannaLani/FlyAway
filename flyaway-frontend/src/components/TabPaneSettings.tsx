@@ -21,7 +21,7 @@ export default function TabPaneSettings({tripId, tripName, setTripName, descript
   
   useEffect(() => {
     if (imageUrl) {
-      setPreview(`http://localhost:3001${imageUrl}`);
+      setPreview(`${import.meta.env.VITE_ASSETS_URL}${imageUrl}`);
     }
   }, [imageUrl]);
 
