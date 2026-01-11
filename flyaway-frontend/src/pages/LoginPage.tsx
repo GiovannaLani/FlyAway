@@ -23,7 +23,7 @@ export default function LoginPage() {
   };
 
   const handleGoogleSignIn = () => {
-    window.location.href = `${import.meta.env.VITE_API_GATEWAY_URL || "http://localhost:3030"}/auth/google`; 
+    window.location.href = `${import.meta.env.VITE_API_URL || "http://localhost:3030"}/auth/google`; 
   }
 
   return (
