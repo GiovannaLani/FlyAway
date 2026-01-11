@@ -8,7 +8,6 @@ console.log("Assets URL:", ASSETS);
 
 const client = axios.create({
   baseURL: API,
-  //headers: { "Content-Type": "application/json" },
 });
 
 export function setAuthToken(token?: string) {
