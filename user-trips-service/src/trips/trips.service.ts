@@ -102,24 +102,9 @@ export class TripsService {
         const isAdmin = userTrip?.role === 'admin';
         const isParticipant = !!userTrip;
 
-        const ownerId = trip.userTrips.find(ut => ut.role === 'admin')?.userId;
-        let isFriend = false;
-        if (!isAdmin && !isParticipant && ownerId && ownerId !== viewerId) {
-            const friendship = await this.friendshipModel.findOne({
-            where: {
-                status: 'accepted',
-                [Op.or]: [
-                { userId: ownerId, friendId: viewerId },
-                { userId: viewerId, friendId: ownerId },
-                ],
-            },
-            });
-            isFriend = !!friendship;
-        }
-
         const canEdit = isAdmin;
         const canViewItinerary = isAdmin || isParticipant;
-        const canViewParticipants = isAdmin || isParticipant || (isFriend && trip.isPublic);
+        const canViewParticipants = isAdmin || isParticipant || trip.isPublic;
         const canViewImages = isAdmin || isParticipant || trip.isPublic;
         const canViewExpenses = isAdmin || isParticipant;
 

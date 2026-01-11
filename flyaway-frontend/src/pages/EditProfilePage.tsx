@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import defaultAvatarImage from "../assets/default-profile-avatar.jpg";
 
 export default function EditProfilePage() {
-  const { me } = useAuth();
+  const { me, loadMe } = useAuth();
   const nav = useNavigate();
 
   const [name, setName] = useState("");
@@ -36,6 +36,7 @@ export default function EditProfilePage() {
         fd.append("image", avatar);
         await client.post("/users/me/avatar", fd);
       }
+      await loadMe();
       nav(`/users/${me?.id}`);
     } catch (err: any) {
       alert(err.response?.data?.message || err.message);

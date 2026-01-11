@@ -40,14 +40,29 @@ export class UsersService {
 
   async addFriend(userId: number, friendEmail: string) {
       const friend = await this.userModel.findOne({ where: { email: friendEmail } });
-      if (!friend) throw new NotFoundException('User not found');
+      if (!friend) throw new NotFoundException('Usuario no encontrado');
 
-      if (friend.id === userId) throw new BadRequestException('Cannot add yourself');
+      if (friend.id === userId) throw new BadRequestException('No puedes agregarte a ti mismo');
 
       const exists = await this.friendshipModel.findOne({
-        where: { userId, friendId: friend.id, status: 'accepted' }
+         where: {
+          [Op.or]: [
+            { userId, friendId: friend.id, status: 'accepted' },
+            { userId: friend.id, friendId: userId, status: 'accepted' }
+          ]
+        }
       });
-      if (exists) throw new BadRequestException('Already friends');
+      if (exists) throw new BadRequestException('Ya son amigos');
+
+      const existsRequest = await this.friendshipModel.findOne({
+        where: { 
+          [Op.or]: [
+            { userId, friendId: friend.id, status: 'pending' },
+            { userId: friend.id, friendId: userId, status: 'pending' }
+          ]
+        }
+      });
+      if (existsRequest) throw new BadRequestException('La solicitud de amistad ya existe');
 
       const friendship = await this.friendshipModel.create({ userId, friendId: friend.id, status: 'pending' });
 
@@ -56,7 +71,12 @@ export class UsersService {
 
   async removeFriend(userId: number, friendId: number) {
     const deleted = await this.friendshipModel.destroy({
-      where: { userId, friendId },
+      where: {
+        [Op.or]: [
+          { userId, friendId },
+          { userId: friendId, friendId: userId }
+        ]
+      }
     });
     if (!deleted) throw new NotFoundException('Friendship not found');
     return { message: 'Friend removed' };
@@ -93,6 +113,11 @@ export class UsersService {
     const request = await this.friendshipModel.findOne({ where: { userId: friendId, friendId: userId, status: 'pending' }});
 
     if (!request) throw new NotFoundException('Friend request not found');
+
+    if (!accept) {
+      await request.destroy();
+      return { message: 'Friend request rejected' };
+    }
 
     request.status = accept ? 'accepted' : 'rejected';
     await request.save();
